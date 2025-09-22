@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Générateur de facture - Parfums</title>
+<style>
+body { font-family: Arial, sans-serif; padding: 18px; background:#f7f7f7; }
+h1 { text-align:center; margin-bottom:6px; }
+.card { background:white; padding:14px; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.08); margin-bottom:12px; }
+label { display:block; margin-top:8px; font-size:14px; }
+input, select { width:100%; padding:8px; margin-top:6px; box-sizing:border-box; border:1px solid #ccc; border-radius:6px; }
+.row { display:flex; gap:8px; }
+.row > * { flex:1; }
+table { width:100%; border-collapse:collapse; margin-top:12px; }
+th, td { padding:8px; border:1px solid #ddd; text-align:left; font-size:14px; }
+.right { text-align:right; }
+.actions { display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; }
+button { padding:10px 12px; border:none; border-radius:6px; cursor:pointer; }
+.btn-primary { background:#2d7df0; color:white; }
+.btn-danger { background:#ff5c5c; color:white; }
+.small { font-size:13px; color:#666; }
+#preview h2 { margin:0 0 6px 0; }
+</style>
+</head>
+<body>
+
+<h1>Générateur de Facture - Parfums</h1>
+
+<div class="card">
+<label>Nom du client</label>
+<input id="clientName" placeholder="Ex: Jean Dupont">
+
+<div class="row">
+  <div>
+    <label>Date de la facture</label>
+    <input type="date" id="invoiceDate">
+  </div>
+  <div>
+    <label>Numéro de facture</label>
+    <input id="invoiceNumber" placeholder="Ex: 000123">
+  </div>
+</div>
+
+<label>Nom de l’entreprise / Marque (s'affiche sur la facture en rose)</label>
+<select id="companySelect">
+  <option value="">-- Sélectionnez une marque --</option>
+  <option value="Parfumerie Xavier">Parfumerie Xavier</option>
+  <option value="Autre">Autre (écrire le nom)</option>
+</select>
+<input id="companyInput" placeholder="Nom de l’entreprise" style="display:none; margin-top:6px;">
+
+<hr style="margin:12px 0;">
+
+<label>Ajouter un parfum</label>
+<div class="row">
+  <select id="brandSelect">
+    <option value="">-- Choisir une marque / parfum --</option>
+    <!-- 500+ marques (exemples) -->
+    <option>Abercrombie & Fitch</option>
+    <option>Acqua di Parma</option>
+    <option>Adidas</option>
+    <option>Armaf</option>
+    <option>Afnan</option>
+    <option>Agent Provocateur</option>
+    <option>Al Haramain</option>
+    <option>Alterna</option>
+    <option>Anna Sui</option>
+    <option>Aramis</option>
+    <option>Ariana Grande</option>
+    <option>Armani</option>
+    <option>Azzaro</option>
+    <option>Balenciaga</option>
+    <option>Bvlgari</option>
+    <option>Byredo</option>
+    <option>Cacharel</option>
+    <option>Calvin Klein</option>
+    <option>Carolina Herrera</option>
+    <option>Celine</option>
+    <option>Chanel</option>
+    <option>Chloé</option>
+    <option>Christian Dior</option>
+    <option>Clive Christian</option>
+    <option>Creed</option>
+    <option>Davidoff</option>
+    <option>Diptyque</option>
+    <option>Dolce & Gabbana</option>
+    <option>Donna Karan</option>
+    <option>Elizabeth Arden</option>
+    <option>Estee Lauder</option>
+    <option>Fendi</option>
+    <option>Floris</option>
+    <option>Frédéric Malle</option>
+    <option>Giorgio Armani</option>
+    <option>Givenchy</option>
+    <option>Gucci</option>
+    <option>Hermès</option>
+    <option>Hugo Boss</option>
+    <option>Issey Miyake</option>
+    <option>Jean Paul Gaultier</option>
+    <option>Jimmy Choo</option>
+    <option>Jo Malone</option>
+    <option>Juicy Couture</option>
+    <option>Kilian</option>
+    <option>Lancôme</option>
+    <option>Le Labo</option>
+    <option>Louis Vuitton</option>
+    <option>Maison Francis Kurkdjian</option>
+    <option>Maison Martin Margiela</option>
+    <option>Marc Jacobs</option>
+    <option>Michael Kors</option>
+    <option>Mugler</option>
+    <option>Narciso Rodriguez</option>
+    <option>Oscar de la Renta</option>
+    <option>Parfums de Marly</option>
+    <option>Penhaligon's</option>
+    <option>Prada</option>
+    <option>Ralph Lauren</option>
+    <option>Roberto Cavalli</option>
+    <option>Salvatore Ferragamo</option>
+    <option>Serge Lutens</option>
+    <option>Tom Ford</option>
+    <option>Viktor & Rolf</option>
+    <option>Yves Saint Laurent</option>
+    <option>Zara</option>
+    <!-- Tu peux compléter jusqu'à 500 marques ici -->
+  </select>
+  <input id="productName" placeholder="Nom du parfum (ou laisse le select)">
+</div>
+
+<div class="row" style="margin-top:8px;">
+  <input id="unitPrice" type="text" placeholder="Prix unitaire (€)">
+  <input id="qty" type="number" step="1" min="1" value="1" placeholder="Quantité">
+</div>
+
+<div class="actions">
+  <button class="btn-primary" onclick="addItem()">Ajouter l'article</button>
+  <button class="btn-danger" onclick="clearItems()">Supprimer tout</button>
+</div>
+
+<table id="itemsTable" style="display:none;">
+  <thead>
+    <tr><th>Produit</th><th>Prix unitaire (€)</th><th>Quantité</th><th>Sous-total (€)</th><th>Action</th></tr>
+  </thead>
+  <tbody></tbody>
+  <tfoot>
+    <tr>
+      <td colspan="3" class="right"><strong>Total HT</strong></td>
+      <td id="totalHT" class="right">0.00</td>
+      <td></td>
+    </tr>
+  </tfoot>
+</table>
+
+<div style="margin-top:10px;" class="small">
+  TVA par défaut : 20% (modifiable dans le code).<br>
+  Remarque : n'utilise pas les logos officiels des marques sans autorisation.
+</div>
+
+<div class="actions" style="margin-top:12px;">
+  <button class="btn-primary" onclick="previewInvoice()">Afficher la facture</button>
+  <button class="btn-primary" onclick="downloadPDF()">Télécharger en PDF</button>
+</div>
+</div>
+
+<div id="preview" class="card" style="display:none"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script>
+let items=[];
+const TVA = 0.20;
+document.getElementById('invoiceDate').valueAsDate=new Date();
+
+// Gestion champ "Autre"
+const companySelect=document.getElementById('companySelect');
+const companyInput=document.getElementById('companyInput');
+companySelect.addEventListener('change', function(){ companyInput.style.display=(this.value==="Autre")?"block":"none"; });
+
+function parsePriceInput(raw){
+  if(!raw) return NaN;
+  let s=String(raw).trim().replace(',','.').replace(/[^0-9.\-]/g,'');
+  return parseFloat(s)||NaN;
+}
+
+function addItem(){
+  let brand=document.getElementById('brandSelect').value;
+  let prodInput=document.getElementById('productName').value.trim();
+  let name=prodInput || brand || 'Article sans nom';
+  let price=parsePriceInput(document.getElementById('unitPrice').value);
+  let qty=parseInt(document.getElementById('qty').value,10);
+  if(!name||isNaN(price)||price<0||isNaN(qty)||qty<1){ alert("Remplis correctement le nom, le prix et la quantité."); return; }
+  items.push({name, price, qty});
+  document.getElementById('productName').value='';
+  document.getElementById('unitPrice').value='';
+  document.getElementById('qty').value=1;
+  renderItems();
+}
+
+function renderItems(){
+  const table=document.getElementById('itemsTable');
+  const tbody=table.querySelector('tbody');
+  tbody.innerHTML='';
+  if(items.length===0){ table.style.display='none'; document.getElementById('preview').style.display='none'; return; }
+  table.style.display='table';
+  let total=0;
+  items.forEach((it,idx)=>{
+    let sub=it.price*it.qty; total+=sub;
+    let tr=document.createElement('tr');
+    tr.innerHTML=`<td>${escapeHtml(it.name)}</td><td class="right">${it.price.toFixed(2)}</td><td class="right">${it.qty}</td><td class="right">${sub.toFixed(2)}</td><td class="right"><button onclick="removeItem(${idx})">Suppr</button></td>`;
+    tbody.appendChild(tr);
+  });
+  document.getElementById('totalHT').textContent=total.toFixed(2);
+}
+
+function removeItem(idx){ items.splice(idx,1); renderItems(); }
+function clearItems(){ if(confirm("Supprimer tous les articles ?")){ items=[]; renderItems(); } }
+
+function escapeHtml(text){ return String(text).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function previewInvoice(){
+  if(items.length===0){ alert("Ajoute au moins un article."); return; }
+  const client=document.getElementById('clientName').value||'Client';
+  const date=document.getElementById('invoiceDate').value;
+  const number=document.getElementById('invoiceNumber').value||'---';
+  const company=(companySelect.value==="Autre"? (companyInput.value||'Parfumerie') : companySelect.value||'Parfumerie');
+  let html=`<h2>FACTURE - <span style="color:deeppink">${escapeHtml(company)}</span></h2>`;
+  html+=`<div><strong>Client :</strong> ${escapeHtml(client)}<br><strong>Date :</strong> ${escapeHtml(date)}<br><strong>N° :</strong> ${escapeHtml(number)}</div><hr>`;
+  html+=`<table style="width:100%;border-collapse:collapse;"><thead><tr><th>Produit</th><th>Prix</th><th>Quantité</th><th>Sous-total</th></tr></thead><tbody>`;
+  let total=0;
+  items.forEach(it=>{ const sub=it.price*it.qty; total+=sub; html+=`<tr><td>${escapeHtml(it.name)}</td><td class="right">${it.price.toFixed(2)} €</td><td class="right">${it.qty}</td><td class="right">${sub.toFixed(2)} €</td></tr>`; });
+  html+=`</tbody></table>`;
+  const tvaAmount=total*TVA; const totalTTC=total+tvaAmount;
+  html+=`<div><strong>Total HT :</strong> ${total.toFixed(2)} €</div>`;
+  html+=`<div><strong>TVA (${(TVA*100).toFixed(0)}%) :</strong> ${tvaAmount.toFixed(2)} €</div>`;
+  html+=`<div style="font-size:18px;margin-top:6px;"><strong>Total TTC :</strong> ${totalTTC.toFixed(2)} €</div>`;
+  const preview=document.getElementById('preview'); preview.style.display='block'; preview.innerHTML=html; preview.scrollIntoView({behavior:"smooth"});
+}
+
+async function downloadPDF(){
+  if(items.length===0){ alert("Ajoute au moins un article."); return; }
+  const { jsPDF } = window.jspdf;
+  const doc=new jsPDF({unit:'mm',format:'a4'}); const marginLeft=15; let y=15; const lineHeight=7;
+  const client=document.getElementById('clientName').value||'Client';
+  const date=document.getElementById('invoiceDate').value;
+  const number=document.getElementById('invoiceNumber').value||'---';
+  const company=(companySelect.value==="Autre"? (companyInput.value||'Parfumerie') : companySelect.value||'Parfumerie');
+  doc.setFontSize(16); doc.setTextColor(219,112,147); doc.text(`FACTURE - ${company}`, marginLeft, y); y+=lineHeight+2;
+  doc.setTextColor(0,0,0); doc.setFontSize(11); doc.text(`Client : ${client}`, marginLeft, y); y+=lineHeight;
+  doc.text(`Date : ${date}`, marginLeft, y); y+=lineHeight;
+  doc.text(`N° facture : ${number}`, marginLeft, y); y+=lineHeight+2;
+  doc.setFontSize(10); doc.text("Produit", marginLeft, y); doc.text("PU (€)", 120, y,{align:'right'});
+  doc.text("Qté", 150, y,{align:'right'}); doc.text("Total (€)", 185, y,{align:'right'}); y+=4;
+  doc.setLineWidth(0.3); doc.line(marginLeft,y,195,y); y+=4;
+  let total=0;
+  items.forEach(it=>{
+    const sub=it.price*it.qty; total+=sub;
+    const lines=doc.splitTextToSize(it.name,85);
+    doc.text(lines, marginLeft, y);
+    doc.text(it.price.toFixed(2), 120, y,{align:'right'});
+    doc.text(String(it.qty), 150, y,{align:'right'});
+    doc.text(sub.toFixed(2), 185, y,{align:'right'});
+    y+=lineHeight*lines.length; if(y>270){ doc.addPage(); y=20; }
+  });
+  y+=6;
+  const tvaAmount=total*TVA; const totalTTC=total+tvaAmount;
+  doc.setFontSize(11); doc.text(`Total HT: ${total.toFixed(2)} €`,150,y,{align:'right'}); y+=lineHeight;
+  doc.text(`TVA (${(TVA*100).toFixed(0)}%): ${tvaAmount.toFixed(2)} €`,150,y,{align:'right'}); y+=lineHeight;
+  doc.setFontSize(13); doc.text(`Total TTC: ${totalTTC.toFixed(2)} €`,150,y,{align:'right'});
+  doc.setFontSize(9); doc.text("Merci pour votre achat !", marginLeft, 290);
+  const filename=`facture_${(number||'000')}_${(new Date()).toISOString().slice(0,10)}.pdf`;
+  doc.save(filename);
+}
+</script>
+
+</body>
+</html>
